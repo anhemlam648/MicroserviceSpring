@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,8 +22,14 @@ public class ServiceInventory {
     }
 
     @Transactional(readOnly = true)
-    public boolean isInStock(String skuCode){
-        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCode(skuCode);
-        return optionalInventory.isPresent();
+    public boolean isInStock(List<String> skuCodes){
+//        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCode(skuCode);
+        for(String skuCode : skuCodes){
+        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCode);
+        if(optionalInventory.isPresent()){
+            return true;
+        }
+        return false;
+//        return optionalInventory.isPresent();
     }
 }
