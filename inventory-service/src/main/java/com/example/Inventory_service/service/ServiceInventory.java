@@ -1,5 +1,6 @@
 package com.example.Inventory_service.service;
 
+import com.example.Inventory_service.dto.Dtoinventory;
 import com.example.Inventory_service.model.Inventory;
 import com.example.Inventory_service.repository.InventoryRepository;
 import lombok.AccessLevel;
@@ -10,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ServiceInventory {
@@ -21,20 +25,37 @@ public class ServiceInventory {
         this.inventoryRepository = inventoryRepository;
     }
 
-    @Transactional(readOnly = true)
-    public boolean isInStock(List<String> skuCodes) {
-//        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCodes);
-//        for (String skuCode : skuCodes) {
-//            Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCode);
-//            if (optionalInventory.isPresent()) {
-//                return true;
-//            }
-//        }
-        //return optionalInventory.isPresent();
-        List<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCodes);
-        return !optionalInventory.isEmpty();
-    }
-
+//    @Transactional(readOnly = true)
+//    public List<Dtoinventory> isInStock(List<String> skuCodes) {
+////        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCodes);
+////        for (String skuCode : skuCodes) {
+////            Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCode);
+////            if (optionalInventory.isPresent()) {
+////                return true;
+////            }
+////        }
+//        //return optionalInventory.isPresent();
+//        List<Inventory> inventories = inventoryRepository.findBySkuCodeIn(skuCodes);
+//        List<Dtoinventory> dtoInventories = inventories.stream()
+//                .map(inventory -> Dtoinventory.builder()
+//                        .skuCode(inventory.getSkuCode())
+//                        .isInStock(inventory.getQuantity() > 0) // Check if quantity is greater than 0
+//                        .build())
+//                .collect(Collectors.toList());
+////        return !optionalInventory.isEmpty();
+//        return dtoInventories;
+//    }
+@Transactional(readOnly = true)
+public List<Dtoinventory> isInStock(List<String> skuCodes) {
+    List<Inventory> inventories = inventoryRepository.findBySkuCodeIn(skuCodes);
+    List<Dtoinventory> dtoInventories = inventories.stream()
+            .map(inventory -> Dtoinventory.builder()
+                    .skuCode(inventory.getSkuCode())
+                    .isInStock(inventory.getQuantity() > 0) // Check if quantity is greater than 0
+                    .build())
+            .collect(Collectors.toList());
+    return dtoInventories;
+}
 
 
 }

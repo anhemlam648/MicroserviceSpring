@@ -1,5 +1,6 @@
 package com.example.Inventory_service.controller;
 
+import com.example.Inventory_service.dto.Dtoinventory;
 import com.example.Inventory_service.service.ServiceInventory;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,18 @@ public class InventoryController {
 //    }
 
 //    @GetMapping("/{sku-code}")
+//    @GetMapping
+//    @ResponseStatus(HttpStatus.OK)
+////    public boolean isInStock(@PathVariable("sku-code") String skuCode){
+////        return serviceInventory.isInStock(skuCode);
+////    }
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-//    public boolean isInStock(@PathVariable("sku-code") String skuCode){
-//        return serviceInventory.isInStock(skuCode);
-//    }
-    public boolean isInStock(@RequestParam List<String> skuCode){
+    public List<Dtoinventory> isInStock(@RequestParam List<String> skuCode) {
         return serviceInventory.isInStock(skuCode);
     }
+//    public List<Dtoinventory> isInStock(@RequestParam List<String> skuCode){
+//
+//        return serviceInventory.isInStock(skuCode);
+//    }
 }

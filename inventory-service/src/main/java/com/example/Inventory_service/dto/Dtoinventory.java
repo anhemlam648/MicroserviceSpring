@@ -1,17 +1,13 @@
 package com.example.Inventory_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Dtoinventory {
-    private Long id;
     private String skuCode;
-    private Integer quantity;
+    private boolean isInStock;
 }
 
