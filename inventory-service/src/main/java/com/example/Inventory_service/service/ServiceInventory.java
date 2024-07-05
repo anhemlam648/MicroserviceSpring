@@ -22,14 +22,19 @@ public class ServiceInventory {
     }
 
     @Transactional(readOnly = true)
-    public boolean isInStock(List<String> skuCodes){
-//        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCode(skuCode);
-        for(String skuCode : skuCodes){
-        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCode);
-        if(optionalInventory.isPresent()){
-            return true;
-        }
-        return false;
-//        return optionalInventory.isPresent();
+    public boolean isInStock(List<String> skuCodes) {
+//        Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCodes);
+//        for (String skuCode : skuCodes) {
+//            Optional<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCode);
+//            if (optionalInventory.isPresent()) {
+//                return true;
+//            }
+//        }
+        //return optionalInventory.isPresent();
+        List<Inventory> optionalInventory = inventoryRepository.findBySkuCodeStock(skuCodes);
+        return !optionalInventory.isEmpty();
     }
+
+
+
 }
