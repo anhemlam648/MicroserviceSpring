@@ -45,17 +45,17 @@ public class ServiceInventory {
 ////        return !optionalInventory.isEmpty();
 //        return dtoInventories;
 //    }
-@Transactional(readOnly = true)
-public List<Dtoinventory> isInStock(List<String> skuCodes) {
-    List<Inventory> inventories = inventoryRepository.findBySkuCodeIn(skuCodes);
-    List<Dtoinventory> dtoInventories = inventories.stream()
-            .map(inventory -> Dtoinventory.builder()
-                    .skuCode(inventory.getSkuCode())
-                    .isInStock(inventory.getQuantity() > 0) // Check if quantity is greater than 0
-                    .build())
-            .collect(Collectors.toList());
-    return dtoInventories;
-}
+    @Transactional(readOnly = true)
+    public List<Dtoinventory> isInStock(List<String> skuCodes) {
+        List<Inventory> inventories = inventoryRepository.findBySkuCodeIn(skuCodes);
+        List<Dtoinventory> dtoInventories = inventories.stream()
+                .map(inventory -> Dtoinventory.builder()
+                        .skuCode(inventory.getSkuCode())
+                        .isInStock(inventory.getQuantity() > 0) // kiểm tra nếu giá trị lớn hơn 0
+                        .build())
+                .collect(Collectors.toList());
+        return dtoInventories;
+    }
 
 
 }
