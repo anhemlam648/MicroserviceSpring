@@ -21,6 +21,7 @@
         <module>order-service</module>
         <module>inventory-service</module>
         <module>discorvery-service</module>
+        <module>gateway-api</module>
     </modules>
 
     <properties>
