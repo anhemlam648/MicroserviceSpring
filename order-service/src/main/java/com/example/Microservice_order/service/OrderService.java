@@ -8,6 +8,7 @@ import com.example.Microservice_order.model.Dtoinventory;
 import com.example.Microservice_order.model.Order;
 import com.example.Microservice_order.model.OrderLineItems;
 import com.example.Microservice_order.repository.OrderRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,7 +87,6 @@ public class OrderService {
             throw new RuntimeException("Failed check from inventory availability", ex);
         }
     }
-
 
 
 }
