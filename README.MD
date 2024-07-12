@@ -14,3 +14,6 @@ cd Microservice-product
 
 # Run the application using Maven
 mvn spring-boot:run
+
+#Tracing zipkin
+run docker run -d -p 9411:9411 openzipkin/zipkin
