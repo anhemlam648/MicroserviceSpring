@@ -1,43 +1,45 @@
 package com.example.Microservice_order.service;
 
-import com.example.Microservice_order.config.WebConfig;
+
 import com.example.Microservice_order.dto.DtoOrder;
-import com.example.Microservice_order.dto.DtoOrderLineItems;
 import com.example.Microservice_order.mapper.MapOrder;
 import com.example.Microservice_order.model.Dtoinventory;
 import com.example.Microservice_order.model.Order;
-import com.example.Microservice_order.model.OrderLineItems;
 import com.example.Microservice_order.repository.OrderRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import event.PlaceOrderEvent;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 
-import java.lang.reflect.Array;
-import java.net.http.WebSocketHandshakeException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final MapOrder mapOrder;
     private final WebClient webClient;
-    @Autowired
-    public OrderService(OrderRepository orderRepository, MapOrder mapOrder, WebClient webClient,WebClient.Builder webClientBuilder) {
-        this.orderRepository = orderRepository;
-        this.mapOrder = mapOrder;
-        this.webClient = webClient;
-//        this.webClient = webClientBuilder.baseUrl("http://localhost:8082").build();
-    }
-
+    private final KafkaTemplate<String, PlaceOrderEvent> kafkaTemplate;
+//    @Autowired
+//    public OrderService(OrderRepository orderRepository, MapOrder mapOrder, WebClient webClient,WebClient.Builder webClientBuilder, KafkaAdminClient kafkaAdminClient) {
+//        this.orderRepository = orderRepository;
+//        this.mapOrder = mapOrder;
+//        this.webClient = webClient;
+//        this.kafkaAdminClient = kafkaAdminClient;
+////        this.webClient = webClientBuilder.baseUrl("http://localhost:8082").build();
+//    }
+//        public void send(String toSend) {
+//            this.template.send("topic1", toSend);
+//
+//        }
     @Transactional
     public Order createOrder(DtoOrder dtoOrder) {
         Order order = mapOrder.mapToOrder(dtoOrder);
@@ -49,7 +51,9 @@ public class OrderService {
         Boolean callresult = checkInventoryAvailability(skuCodes);
         if(callresult){
             order = orderRepository.save(order);
-            log.info("Order {} is saved", order.getId());
+            String message = "Order created with ID: " + order.getId();
+            kafkaTemplate.send("notification",new PlaceOrderEvent(order.getOrderNumber()));
+//            log.info("Order {} is saved", order.getId());
         }else{
             throw new IllegalArgumentException("Is not stock from produc, please try again");
         }
