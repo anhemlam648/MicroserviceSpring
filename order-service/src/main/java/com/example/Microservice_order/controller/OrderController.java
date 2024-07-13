@@ -15,32 +15,29 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-//    @PostMapping("/add")
-//    @ResponseBody
-//    @CircuitBreaker(name="inventory", fallbackMethod = "fallbackMethod")
-//    public ResponseEntity createOrder (@RequestBody() DtoOrder dtoOrder){
-//        try {
-//            Order createdOrder = orderService.createOrder(dtoOrder);
-//            return ResponseEntity.ok(createdOrder);
-//        }catch (RuntimeException ex){
-//            throw ex;
-//        }catch(Exception ex){
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create order: " + ex.getMessage());
-//        }
-//    }
     @PostMapping("/add")
     @ResponseBody
-    @CircuitBreaker(name = "inventoryService", fallbackMethod = "fallbackMethod")
-    public ResponseEntity createOrder(@RequestBody DtoOrder dtoOrder) {
+    @CircuitBreaker(name="inventoryService", fallbackMethod = "fallbackMethod")
+    public ResponseEntity createOrder (@RequestBody() DtoOrder dtoOrder){
         try {
             Order createdOrder = orderService.createOrder(dtoOrder);
             return ResponseEntity.ok(createdOrder);
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
+        }catch(Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create order: " + ex.getMessage());
         }
     }
+//    @PostMapping("/add")
+//    @ResponseBody
+//    @CircuitBreaker(name = "inventoryService", fallbackMethod = "fallbackMethod")
+//    public ResponseEntity createOrder(@RequestBody DtoOrder dtoOrder) {
+//        try {
+//            Order createdOrder = orderService.createOrder(dtoOrder);
+//            return ResponseEntity.ok(createdOrder);
+//        }
+//        catch (Exception ex) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create order: " + ex.getMessage());
+//        }
+//    }
     @GetMapping("/list")
     @ResponseBody
     public ResponseEntity<Object> getAllOrders(){

@@ -1,13 +1,15 @@
 package com.example.Notification_service.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class PlaceOrderEvent {
+@Setter
+@Getter
+public class PlaceOrderEvent implements Serializable {
 
     private String numberOrder;
 }
