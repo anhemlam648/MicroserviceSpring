@@ -17,3 +17,9 @@ mvn spring-boot:run
 
 #Tracing zipkin
 run docker run -d -p 9411:9411 openzipkin/zipkin
+
+#Architecture using Kafka
+run docker compose up -d
+run docker ps
+run docker logs -f broker
+clear
