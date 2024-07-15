@@ -1,6 +1,6 @@
 package com.example.Notification_service;
 
-import com.example.Notification_service.event.PlaceOrderEvent;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

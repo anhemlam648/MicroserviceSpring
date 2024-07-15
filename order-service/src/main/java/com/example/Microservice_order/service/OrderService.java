@@ -23,20 +23,21 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OrderService {
         private final OrderRepository orderRepository;
         private final MapOrder mapOrder;
         private final WebClient webClient;
         private final KafkaTemplate<String, PlaceOrderEvent> kafkaTemplate;
 
-        @Autowired
-        public OrderService(OrderRepository orderRepository, MapOrder mapOrder, WebClient webClient,WebClient.Builder webClientBuilder, KafkaTemplate kafkaTemplate) {
-            this.orderRepository = orderRepository;
-            this.mapOrder = mapOrder;
-            this.webClient = webClient;
-            this.kafkaTemplate = kafkaTemplate;
-    //        this.webClient = webClientBuilder.baseUrl("http://localhost:8082").build();
-        }
+//        @Autowired
+//        public OrderService(OrderRepository orderRepository, MapOrder mapOrder, WebClient webClient,WebClient.Builder webClientBuilder, KafkaTemplate kafkaTemplate) {
+//            this.orderRepository = orderRepository;
+//            this.mapOrder = mapOrder;
+//            this.webClient = webClient;
+//            this.kafkaTemplate = kafkaTemplate;
+//    //        this.webClient = webClientBuilder.baseUrl("http://localhost:8082").build();
+//        }
     //        public void send(String toSend) {
     //            this.template.send("topic1", toSend);
     //
