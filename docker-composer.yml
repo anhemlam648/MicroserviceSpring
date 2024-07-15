@@ -1,15 +1,15 @@
 version: '3.7'
 services:
-  kafka:
-    bootstrap-servers: broker:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-    template:
-      default-topic: notification
+  ##MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: nghia123
+      MONGO_INITDB_ROOT_PASSWORD: hoR84hLvcfDIlJQP
+  ##Zookeeper
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     container_name: zookeeper
@@ -18,6 +18,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+  ##Broker
   broker:
     image: confluentinc/cp-kafka:7.0.1
     container_name: broker
@@ -29,8 +30,90 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  ##Zipkin
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+  ##Eureka
+  discovery-server:
+    image: microservices-tutorial/discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8776:8776"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - zipkin
 
+  gateway-api:
+    container_name: gateway-api
+    image: microservices-tutorial/api-gateway:latest
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8776/eureka
+    depends_on:
+      - discovery-server
+      - zipkin
+      - broker
+  ##Product
+  product-service:
+    container_name: product-service
+    image: microservices-tutorial/product-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - mongodb
+      - discovery-server
+      - gateway-api
+  ##Order
+  order-service:
+    container_name: order-service
+    image: microservices-tutorial/order-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/microservice-order
+    depends_on:
+      - broker
+      - zipkin
+      - discovery-server
+      - gateway-api
+  ##Inventory
+  inventory-service:
+    container_name: inventory-service
+    image: microservices-tutorial/inventory-service:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/microservice-inventory
+    depends_on:
+      - discovery-server
+      - gateway-api
+  ##Notification
+  notification-service:
+    container_name: notification-service
+    image: microservices-tutorial/notification-service:latest
+    environment:
+      SPRING_APPLICATION_NAME: Notification-service
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8776/eureka
+      SERVER_PORT: 8035
+      SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/
+      SPRING_SLEUTH_INTEGRATION_ENABLED: true
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: 1.0
+      SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED: false
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:9092
+      SPRING_KAFKA_TEMPLATE_DEFAULT_TOPIC: notification
+      SPRING_KAFKA_TEMPLATE_GROUP_ID: notificationId
+      SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER: org.apache.kafka.common.serialization.StringDeserializer
+      SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER: org.springframework.kafka.support.serializer.JsonDeserializer
+      SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TYPE_MAPPING: event:com.programming.techie.PlacedOrderEvent
+    depends_on:
+      - zipkin
+      - broker
+      - discovery-server
+      - gateway-api
